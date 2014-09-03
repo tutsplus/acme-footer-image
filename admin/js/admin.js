@@ -4,12 +4,13 @@
  *
  * Displays the media uploader for selecting an image.
  *
- * @since 0.1.0
+ * @param    object    $    A reference to the jQuery object
+ * @since    0.1.0
  */
-function renderMediaUploader() {
+function renderMediaUploader( $ ) {
 	'use strict';
 
-	var file_frame, image_data;
+	var file_frame, image_data, json;
 
 	/**
 	 * If an instance of file_frame already exists, then we can open it
@@ -49,9 +50,33 @@ function renderMediaUploader() {
 	 */
 	file_frame.on( 'insert', function() {
 
-		/**
-		 * We'll cover this in the next version.
-		 */
+		// Read the JSON data returned from the Media Uploader
+		json = file_frame.state().get( 'selection' ).first().toJSON();
+
+		// First, make sure that we have the URL of an image to display
+		if ( 0 > $.trim( json.url.length ) ) {
+			return;
+		}
+
+		// After that, set the properties of the image and display it
+		$( '#featured-footer-image-container' )
+			.children( 'img' )
+				.attr( 'src', json.url )
+				.attr( 'alt', json.caption )
+				.attr( 'title', json.title )
+				.show()
+			.parent()
+			.removeClass( 'hidden' );
+
+		// Next, hide the anchor responsible for allowing the user to select an image
+		$( '#featured-footer-image-container' )
+			.prev()
+			.hide();
+
+		// Display the anchor for the removing the featured image
+		$( '#featured-footer-image-container' )
+			.next()
+			.show();
 
 	});
 
@@ -60,17 +85,59 @@ function renderMediaUploader() {
 
 }
 
+/**
+ * Callback function for the 'click' event of the 'Remove Footer Image'
+ * anchor in its meta box.
+ *
+ * Resets the meta box by hiding the image and by hiding the 'Remove
+ * Footer Image' container.
+ *
+ * @param    object    $    A reference to the jQuery object
+ * @since    0.2.0
+ */
+function resetUploadForm( $ ) {
+	'use strict';
+
+	// First, we'll hide the image
+	$( '#featured-footer-image-container' )
+		.children( 'img' )
+		.hide();
+
+	// Then display the previous container
+	$( '#featured-footer-image-container' )
+		.prev()
+		.show();
+
+	// Finally, we add the 'hidden' class back to this anchor's parent
+	$( '#featured-footer-image-container' )
+		.next()
+		.hide()
+		.addClass( 'hidden' );
+
+}
+
 (function( $ ) {
 	'use strict';
 
 	$(function() {
+
 		$( '#set-footer-thumbnail' ).on( 'click', function( evt ) {
 
 			// Stop the anchor's default behavior
 			evt.preventDefault();
 
 			// Display the media uploader
-			renderMediaUploader();
+			renderMediaUploader( $ );
+
+		});
+
+		$( '#remove-footer-thumbnail' ).on( 'click', function( evt ) {
+
+			// Stop the anchor's default behavior
+			evt.preventDefault();
+
+			// Remove the image, toggle the anchors
+			resetUploadForm( $ );
 
 		});
 

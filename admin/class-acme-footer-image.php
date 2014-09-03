@@ -48,7 +48,7 @@ class Acme_Footer_Image {
 	public function __construct() {
 
 		$this->name = 'acme-footer-image';
-		$this->version = '0.1.0';
+		$this->version = '0.2.0';
 
 	}
 
@@ -60,6 +60,7 @@ class Acme_Footer_Image {
 	 */
 	public function run() {
 
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_styles' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
 
@@ -103,6 +104,21 @@ class Acme_Footer_Image {
 			array( 'jquery' ),
 			$this->version,
 			'all'
+		);
+
+	}
+
+	/**
+	 * Registers the stylesheets for handling the meta box
+	 *
+	 * @since 0.2.0
+	 */
+	public function enqueue_styles() {
+
+		wp_enqueue_style(
+			$this->name,
+			plugin_dir_url( __FILE__ ) . 'css/admin.css',
+			array()
 		);
 
 	}
