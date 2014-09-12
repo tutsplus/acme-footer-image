@@ -48,7 +48,7 @@ class Acme_Footer_Image {
 	public function __construct() {
 
 		$this->name = 'acme-footer-image';
-		$this->version = '0.2.0';
+		$this->version = '1.0.0';
 
 	}
 
@@ -63,6 +63,8 @@ class Acme_Footer_Image {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_styles' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
+		add_action( 'save_post', array( $this, 'save_post' ) );
+		add_action( 'the_content', array( $this, 'the_content' ) );
 
 	}
 
@@ -120,6 +122,63 @@ class Acme_Footer_Image {
 			plugin_dir_url( __FILE__ ) . 'css/admin.css',
 			array()
 		);
+
+	}
+
+	/**
+	 * Sanitized and saves the post featured footer image meta data specific with this post.
+	 *
+	 * @param    int    $post_id    The ID of the post with which we're currently working.
+	 * @since    1.0.0
+	 */
+	public function save_post( $post_id ) {
+
+		if ( isset( $_REQUEST['footer-thumbnail-src'] ) ) {
+			update_post_meta( $post_id, 'footer-thumbnail-src', sanitize_text_field( $_REQUEST['footer-thumbnail-src'] ) );
+		}
+
+		if ( isset( $_REQUEST['footer-thumbnail-title'] ) ) {
+			update_post_meta( $post_id, 'footer-thumbnail-title', sanitize_text_field( $_REQUEST['footer-thumbnail-title'] ) );
+		}
+
+		if ( isset( $_REQUEST['footer-thumbnail-alt'] ) ) {
+			update_post_meta( $post_id, 'footer-thumbnail-alt', sanitize_text_field( $_REQUEST['footer-thumbnail-alt'] ) );
+		}
+
+	}
+
+	/**
+	 * If the current post is a single post, check to see if there is a featured image.
+	 * If so, append is to the post content prior to rendering the post.
+	 *
+	 * @param   string    $content    The content of the post.
+	 * @since   1.0.0
+	 */
+	public function the_content( $content ) {
+
+		// We only care about appending the image to single pages
+		if ( is_single() ) {
+
+			// In order to append an image, there has to be at least a source attribute
+			if ( '' !== ( $src = get_post_meta( get_the_ID(), 'footer-thumbnail-src', true ) ) ) {
+
+				// read the remaining attributes even if they are empty strings
+				$alt = get_post_meta( get_the_ID(), 'footer-thumbnail-alt', true );
+				$title = get_post_meta( get_the_ID(), 'footer-thumbnail-title', true );
+
+				// create the image element within its own container
+				$img_html = '<p id="footer-thumbnail">';
+					$img_html .= "<img src='$src' alt='$alt' title='$title' />";
+				$img_html .= '</p><!-- #footer-thumbnail -->';
+
+				// append it to the content
+				$content .= $img_html;
+
+			}
+
+		}
+
+		return $content;
 
 	}
 

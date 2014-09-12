@@ -15,7 +15,7 @@
  * Plugin Name: Acme Footer Image
  * Plugin URI:  https://github.com/tutsplus/acme-footer-image
  * Description: Appends a featured image at the bottom of the content of a post or page.
- * Version:     0.2.0
+ * Version:     1.0.0
  * Author:      Tom McFarlin
  * Author URI:  http://tommcfarlin.com
  * License:     GPL-2.0+

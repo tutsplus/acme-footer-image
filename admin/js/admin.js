@@ -78,6 +78,11 @@ function renderMediaUploader( $ ) {
 			.next()
 			.show();
 
+		// Store the image's information into the meta data fields
+		$( '#footer-thumbnail-src' ).val( json.url );
+		$( '#footer-thumbnail-title' ).val( json.title );
+		$( '#footer-thumbnail-alt' ).val( json.title );
+
 	});
 
 	// Now display the actual file_frame
@@ -108,11 +113,46 @@ function resetUploadForm( $ ) {
 		.prev()
 		.show();
 
-	// Finally, we add the 'hidden' class back to this anchor's parent
+	// We add the 'hidden' class back to this anchor's parent
 	$( '#featured-footer-image-container' )
 		.next()
 		.hide()
 		.addClass( 'hidden' );
+
+	// Finally, we reset the meta data input fields
+	$( '#featured-footer-image-info' )
+		.children()
+		.val( '' );
+
+}
+
+/**
+ * Checks to see if the input field for the thumbnail source has a value.
+ * If so, then the image and the 'Remove featured image' anchor are displayed.
+ *
+ * Otherwise, the standard anchor is rendered.
+ *
+ * @param    object    $    A reference to the jQuery object
+ * @since    1.0.0
+ */
+function renderFeaturedImage( $ ) {
+
+	/* If a thumbnail URL has been associated with this image
+	 * Then we need to display the image and the reset link.
+	 */
+	if ( '' !== $.trim ( $( '#footer-thumbnail-src' ).val() ) ) {
+
+		$( '#featured-footer-image-container' ).removeClass( 'hidden' );
+
+		$( '#set-footer-thumbnail' )
+			.parent()
+			.hide();
+
+		$( '#remove-footer-thumbnail' )
+			.parent()
+			.removeClass( 'hidden' );
+
+	}
 
 }
 
@@ -120,6 +160,8 @@ function resetUploadForm( $ ) {
 	'use strict';
 
 	$(function() {
+
+		renderFeaturedImage( $ );
 
 		$( '#set-footer-thumbnail' ).on( 'click', function( evt ) {
 
