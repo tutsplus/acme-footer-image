@@ -84,6 +84,46 @@ function renderMediaUploader( $ ) {
 		$( '#footer-thumbnail-alt' ).val( json.title );
 
 	});
+	
+	/**
+	 * Add support for embedded URL.
+	 */
+	file_frame.on( 'embed', function() {
+			var state = file_frame.state(),
+			type = state.get('type'),
+			embed = state.props.toJSON();
+			
+		// First, make sure that we have the URL of an image to display
+		if ( 0 > $.trim( embed.url.length ) ) {
+			return;
+		}
+
+		// After that, set the properties of the image and display it
+		$( '#featured-footer-image-container' )
+			.children( 'img' )
+				.attr( 'src', embed.url )
+				.attr( 'alt', embed.caption )
+				.attr( 'title', embed.alt )
+				.show()
+			.parent()
+			.removeClass( 'hidden' );
+
+		// Next, hide the anchor responsible for allowing the user to select an image
+		$( '#featured-footer-image-container' )
+			.prev()
+			.hide();
+
+		// Display the anchor for the removing the featured image
+		$( '#featured-footer-image-container' )
+			.next()
+			.show();
+
+		// Store the image's information into the meta data fields
+		$( '#footer-thumbnail-src' ).val( embed.url );
+		$( '#footer-thumbnail-title' ).val( embed.alt );
+		$( '#footer-thumbnail-alt' ).val( embed.alt );
+
+	});
 
 	// Now display the actual file_frame
 	file_frame.open();
